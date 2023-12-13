@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Text Art Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            border: 1px solid #000;
+        }
+    </style>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-icons.css">
+    <script src="js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+    <div class="container" style="max-width: 100%;margin: 20px auto;">
+        <div class="row">
+            <div class="col">
+
+                <div class="controls">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title">生成器</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group mb-3">
+                                <label for="textInput" class="input-group-text">输入文字</label>
+                                <input type="text" id="textInput" class="form-control" placeholder="932°F PIZZA MARKET"
+                                    value="932°F PIZZA MARKET">
+                            </div>
+                            <div class="input-group mb-3">
+                                <label for="canvasWidth" class="input-group-text">画布宽度</label>
+                                <input type="text" id="canvasWidth" class="form-control" placeholder="600" value="600">
+                            </div>
+                            <div class="input-group mb-3">
+                                <label for="canvasHeight" class="input-group-text">画布高度</label>
+                                <input type="text" id="canvasHeight" class="form-control" placeholder="600" value="600">
+                            </div>
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="randomColorCheck"
+                                    checked>
+                                <label class="form-check-label" for="randomColorCheck">随机颜色</label>
+                            </div>
+                            <div id="colorInputContainer" style="display: none;">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="colorInput1" class="form-label">字体颜色1</label>
+                                        <input type="color" class="form-control form-control-color mb-3" id="colorInput1"
+                                            value="#EC0022" title="Choose your color">
+                                    </div>
+                                    <div class="col">
+                                        <label for="colorInput2" class="form-label">字体颜色2</label>
+                                        <input type="color" class="form-control form-control-color mb-3" id="colorInput2"
+                                            value="#00902F" title="Choose your color">
+                                    </div>
+                                    <div class="col">
+                                        <label for="colorInput3" class="form-label">字体颜色3</label>
+                                        <input type="color" class="form-control form-control-color mb-3" id="colorInput3"
+                                            value="#FF6800" title="Choose your color">
+                                    </div>
+                                </div>
+                            </div>
+                            <label for="fontSizeSlider">字号大小：<span id="fontSizeSlider-span">150</span></label>
+                            <input type="range" class="form-range mb-3" id="fontSizeSlider" min="10" max="500"
+                                value="150">
+                            <br>
+                            <button type="button" id="generateBtn" class="btn btn-outline-primary">生成</button>
+                            <button type="button" id="exportBtn" class="btn btn-outline-success">导出</button>
+                        </div>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title">物理属性设置</h5>
+                        </div>
+                        <div class="card-body">
+                            <label for="gravitySliderY">竖向重力：<span id="gravitySliderY-span">0</span><button
+                                    class="btn btn-outline-primary btn-sm ms-3"
+                                    onclick="document.getElementById('gravitySliderY').value=0;document.getElementById('gravitySliderY-span').textContent=0;"><i
+                                        class="bi bi-arrow-clockwise"></i></button></label>
+                            <input type="range" class="form-range" id="gravitySliderY" min="-2" max="2" value="0"
+                                step="0.1">
+                            <label for="gravitySliderX">横向重力：<span id="gravitySliderX-span">0</span><button
+                                    class="btn btn-outline-primary btn-sm ms-3"
+                                    onclick="document.getElementById('gravitySliderX').value=0;document.getElementById('gravitySliderX-span').textContent=0;"><i
+                                        class="bi bi-arrow-clockwise"></i></button></label>
+                            <input type="range" class="form-range" id="gravitySliderX" min="-2" max="2" value="0"
+                                step="0.1">
+                        </div>
+                    </div>
+                    <br>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title">渲染界面</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="canvas-container">
+                            <canvas id="canvas" style="width: 600px;height: 600px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title">调整界面</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="matter-canvas">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/fabric.min.js"></script>
+    <script src="js/matter.js"></script>
+    <script>
+        document.getElementById("gravitySliderY").addEventListener('change', (e) => {
+            const value = e.target.value;
+            document.getElementById("gravitySliderY-span").textContent = `${value}`;
+        });
+        document.getElementById("gravitySliderX").addEventListener('change', (e) => {
+            const value = e.target.value;
+            document.getElementById("gravitySliderX-span").textContent = `${value}`;
+        });
+        document.getElementById("gravitySliderY").addEventListener('input', (e) => {
+            const value = e.target.value;
+            document.getElementById("gravitySliderY-span").textContent = `${value}`;
+        });
+        document.getElementById("gravitySliderX").addEventListener('input', (e) => {
+            const value = e.target.value;
+            document.getElementById("gravitySliderX-span").textContent = `${value}`;
+        });
+        document.getElementById("fontSizeSlider").addEventListener('change', (e) => {
+            const value = e.target.value;
+            document.getElementById("fontSizeSlider-span").textContent = `${value}`;
+        });
+        document.getElementById("fontSizeSlider").addEventListener('input', (e) => {
+            const value = e.target.value;
+            document.getElementById("fontSizeSlider-span").textContent = `${value}`;
+        });
+        document.getElementById("randomColorCheck").addEventListener('change', (e) => {
+            console.log(e);
+            if (e.target.checked) {
+                document.getElementById("colorInputContainer").style.display = "none";
+            } else {
+                document.getElementById("colorInputContainer").style.display = "block";
+            }
+        });
+    </script>
+    <script>
+        var canvasWidth = 600;
+        var canvasHeight = 600;
+        var canvas = new fabric.Canvas("canvas", {
+            width: 600,
+            height: 600
+        });
+        var generateBtn = document.getElementById("generateBtn");
+        var exportBtn = document.getElementById("exportBtn");
+
+        var RAFID;
+        canvas.on({
+            'object:rotating': updateMatter,
+            'object:scaling': updateMatter,
+            'object:moving': updateMatter
+        });
+        function updateMatter(e){
+                cancelAnimationFrame(RAFID)
+                Matter.Body.setAngle(e.target.matterObj, e.target.angle / (180 / Math.PI));
+                Matter.Body.setPosition(e.target.matterObj, {x:e.target.left, y:e.target.top});
+                Matter.Body.update(e.target.matterObj)
+                RAFID=requestAnimationFrame(animate);
+        }
+        
+
+        var svgfonts = {};
+        const characters = [
+            'FS', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+        ];
+        async function fetchSVG(characters) {
+            for (const char of characters) {
+                try {
+                    fabric.loadSVGFromURL(`fonts/${char}.svg`, function (objects, options) {
+                        var svgText = fabric.util.groupSVGElements(objects, options);
+                        svgfonts[char] = svgText;
+                    });
+                } catch (error) {
+                    console.error(`Error fetching SVG for character ${char}:`, error);
+                }
+            }
+        }
+
+        fetchSVG(characters)
+            .then(() => {
+                console.log(svgfonts);
+            })
+            .catch(error => {
+                console.error('Error fetching SVGs:', error);
+            });
+        generateBtn.addEventListener("click", function () {
+
+            var textInput = document.getElementById("textInput").value;
+            canvasWidth = parseInt(document.getElementById("canvasWidth").value);
+            canvasHeight = parseInt(document.getElementById("canvasHeight").value);
+            var fontSize = parseInt(document.getElementById("fontSizeSlider").value);
+            canvas.clear();
+            matterInit();
+
+            canvas.setDimensions({
+                width: canvasWidth,
+                height: canvasHeight
+            });
+            canvas.backgroundColor = "#feefd6"
+
+            function getRandomPosition() {
+                var x = Math.random() * (canvasWidth);
+                var y = Math.random() * canvasHeight;
+                x = Math.min(Math.max(x, fontSize), canvasWidth - fontSize);
+                y = Math.min(Math.max(y, fontSize), canvasHeight - fontSize);
+                return {
+                    x: x,
+                    y: y
+                };
+            }
+
+            function getRandomAngle() {
+                var angle = (Math.random() > 0.5 ? -1 : 1) * Math.random() * 45;
+                return angle;
+            }
+
+            function getRandomColor() {
+                var letters = "0123456789ABCDEF";
+                var color = "#";
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+            textInput = textInput.toUpperCase()
+            textInput = textInput.replace(/°F/g, "%")
+
+            var tlength = textInput.replace(" ", "").length;
+            var boxsize = fontSize * 1.1;
+            var wc = canvasWidth / boxsize;
+            var hc = canvasHeight / boxsize;
+            if (tlength > wc * hc) {
+                console.log("字数/字体过大无法保证不重复");
+            }
+            var prePositions = [];
+            var prePositions2 = [];
+            for (var i = 0; i < wc; i++) {
+                for (var j = 0; j < hc; j++) {
+                    prePositions.push({
+                        x: Math.min(Math.max(i * fontSize + boxsize / 2, 5), canvasWidth - fontSize /
+                            2),
+                        y: Math.min(Math.max(j * fontSize + boxsize / 2, 5), canvasHeight - fontSize /
+                            2)
+                    });
+                }
+            }
+            for (var i = 0; i < wc - 1; i++) {
+                for (var j = 0; j < hc - 1; j++) {
+                    prePositions2.push({
+                        x: Math.min(Math.max(i * fontSize + boxsize, 5), canvasWidth - fontSize),
+                        y: Math.min(Math.max(j * fontSize + boxsize, 5), canvasHeight - fontSize)
+                    });
+                }
+            }
+            var usedprePositions = [];
+
+            var words = textInput.split(" ");
+            for (var wi in words) {
+                var fontcolor = getRandomColor();
+                for (var i in words[wi]) {
+                    var svgname = words[wi][i]
+                    if (svgname == '%') {
+                        svgname = 'FS'
+                    }
+                    if (svgname == ' ') {
+                        continue;
+                    }
+                    if (!document.getElementById("randomColorCheck").checked) {
+                        fontcolor = document.getElementById("colorInput"+(i%3+1)).value;
+                    }
+                    svgfonts[svgname].clone(function (svgText) {
+                        var position = getRandomPosition();
+                        if (prePositions.length > 0) {
+                            position = prePositions.splice(Math.floor(Math.random() * prePositions
+                                .length), 1)[0];
+                        } else {
+                            if (prePositions2.length > 0) {
+                                position = prePositions2.splice(Math.floor(Math.random() * prePositions2
+                                    .length), 1)[0];
+                            }
+                        }
+                        var angle = getRandomAngle();
+                        //var angle = 0;
+                        svgText.set({
+                            originX: "center",
+                            originY: "center",
+                            selectable: true,
+                            fill: fontcolor,
+                            objectCaching: false
+                        });
+                        if (svgText.type == "group") {
+                            var sobjects = svgText.getObjects();
+                            for (var i in sobjects) {
+                                sobjects[i].set({
+                                    fill: fontcolor
+                                });
+                            }
+                        }
+                        svgText.setPositionByOrigin(new fabric.Point(position.x, position.y), "center",
+                            "center");
+                        svgText.scale(1 / 200 * fontSize);
+                        svgText.rotate(angle);
+                        var svgTextCoords = svgText.getCoords();
+                        createRect(svgText, svgTextCoords[0].x + svgText.getScaledWidth() / 2,
+                            svgTextCoords[0].y + svgText.getScaledHeight() / 2, svgText
+                            .getScaledWidth(), svgText.getScaledHeight(), svgText.angle);
+                        canvas.add(svgText);
+                    })
+
+
+
+                }
+
+            }
+            canvas.renderAll();
+            animate()
+
+
+        });
+
+        exportBtn.addEventListener("click", function () {
+            var svg = canvas.toSVG();
+            var blob = new Blob([svg], {
+                type: "image/svg+xml"
+            });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement("a");
+            a.href = url;
+            a.download = "text_art.svg";
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // 创建Matter.js引擎
+        var Engine = Matter.Engine,
+            Render = Matter.Render,
+            Runner = Matter.Runner,
+            Composites = Matter.Composites,
+            Common = Matter.Common,
+            MouseConstraint = Matter.MouseConstraint,
+            Mouse = Matter.Mouse,
+            Composite = Matter.Composite,
+            Bodies = Matter.Bodies;
+        var world, engine, render, runner;
+
+        function matterInit() {
+            document.getElementById("matter-canvas").innerHTML = "";
+            engine = Engine.create();
+            world = engine.world;
+            // create renderer
+            render = Render.create({
+                element: document.getElementById("matter-canvas"),
+                engine: engine,
+                options: {
+                    width: canvasWidth,
+                    height: canvasHeight,
+                    showVelocity: true,
+                    showAngleIndicator: true
+                }
+            });
+
+            Render.run(render);
+            runner = Runner.create();
+            Runner.run(runner, engine);
+            Composite.add(world, [
+                Bodies.rectangle(canvasWidth / 2, -20, canvasWidth, 50, {
+                    isStatic: true
+                }),
+                Bodies.rectangle(canvasWidth / 2, canvasHeight + 20, canvasWidth, 50, {
+                    isStatic: true
+                }),
+                Bodies.rectangle(canvasWidth + 20, canvasHeight / 2, 50, canvasHeight, {
+                    isStatic: true
+                }),
+                Bodies.rectangle(-20, canvasHeight / 2, 50, canvasHeight, {
+                    isStatic: true
+                })
+            ]);
+            engine.gravity.y = 0;
+            var mouse = Mouse.create(render.canvas),
+                mouseConstraint = MouseConstraint.create(engine, {
+                    mouse: mouse,
+                    constraint: {
+                        stiffness: 0.2,
+                        render: {
+                            visible: false
+                        }
+                    }
+                });
+
+            Composite.add(world, mouseConstraint);
+            render.mouse = mouse;
+        }
+
+        matterInit();
+
+        function createRect(obj, x, y, width, height, angle) {
+            const box = Bodies.rectangle(x, y, width, height);
+            Matter.Body.setAngle(box, angle / (180 / Math.PI));
+            Matter.World.add(world, box);
+            obj.matterObj = box;
+        }
+
+        function animate() {
+            engine.gravity.x = document.getElementById("gravitySliderX").value;
+            engine.gravity.y = document.getElementById("gravitySliderY").value;
+            Engine.update(engine);
+            canvas.forEachObject(function (obj) {
+                const updatedX = obj.matterObj.position.x;
+                const updatedY = obj.matterObj.position.y;
+                const updatedAngle = obj.matterObj.angle;
+                obj.set({
+                    left: updatedX,
+                    top: updatedY,
+                    angle: updatedAngle * (180 / Math.PI)
+                });
+            });
+            canvas.renderAll();
+            RAFID = requestAnimationFrame(animate)
+        }
+    </script>
+</body>
+
+</html>
