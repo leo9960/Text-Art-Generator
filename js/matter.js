@@ -5426,6 +5426,20 @@ var Vector = __webpack_require__(2);
             }
         }
 
+        if(parts.length==0)
+        {
+            for (v = 0; v < vertexSets.length; v += 1) {
+                vertices = vertexSets[v];
+
+                vertices = Vertices.hull(vertices);
+
+                parts.push({
+                    position: { x: x, y: y },
+                    vertices: vertices
+                });
+            }
+        }
+
         // create body parts
         for (i = 0; i < parts.length; i++) {
             parts[i] = Body.create(Common.extend(parts[i], options));
