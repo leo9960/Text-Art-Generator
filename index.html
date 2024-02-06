@@ -31,7 +31,7 @@
                             <div class="input-group mb-3">
                                 <label for="textInput" class="input-group-text">输入文字</label>
                                 <input type="text" id="textInput" class="form-control" placeholder="932°F PIZZA MARKET"
-                                    value="932°F PIZZA MARKET">
+                                    value="测试932°F PIZZA MARKET">
                             </div>
                             <div class="input-group mb-3">
                                 <label for="canvasWidth" class="input-group-text">画布宽度</label>
@@ -68,6 +68,9 @@
                             <label for="fontSizeSlider">字号大小：<span id="fontSizeSlider-span">150</span></label>
                             <input type="range" class="form-range mb-3" id="fontSizeSlider" min="10" max="500"
                                 value="150">
+                            <div class="text-muted" style="font-size: 12px;">
+                                调整字号时建议先暂停物理模拟，防止字体重叠时触发碰撞检测导致位置变化
+                            </div>
                             <br>
                             <button type="button" id="generateBtn" class="btn btn-outline-primary">生成</button>
                             <button type="button" id="exportBtn" class="btn btn-outline-success">导出</button>
@@ -161,10 +164,32 @@
         document.getElementById("fontSizeSlider").addEventListener('change', (e) => {
             const value = e.target.value;
             document.getElementById("fontSizeSlider-span").textContent = `${value}`;
+            if(canvas != null){
+                canvas.forEachObject(function (obj) {
+                    var scale = 1 / 200 * value;
+                    Matter.Body.scale(obj.matterObj, scale/obj.scaleX,scale/obj.scaleY);
+                    obj.set({
+                        scaleX: scale,
+                        scaleY: scale,
+                    });
+                });
+                canvas.renderAll();
+            }
         });
         document.getElementById("fontSizeSlider").addEventListener('input', (e) => {
             const value = e.target.value;
             document.getElementById("fontSizeSlider-span").textContent = `${value}`;
+            if(canvas != null){
+                canvas.forEachObject(function (obj) {
+                    var scale = 1 / 200 * value;
+                    Matter.Body.scale(obj.matterObj, scale/obj.scaleX,scale/obj.scaleY);
+                    obj.set({
+                        scaleX: scale,
+                        scaleY: scale,
+                    });
+                });
+                canvas.renderAll();
+            }
         });
         document.getElementById("randomColorCheck").addEventListener('change', (e) => {
             if (e.target.checked) {
@@ -297,6 +322,7 @@
             if(isrunning){
                 Runner.stop(runner);
                 isrunning = false;
+                RAFID = requestAnimationFrame(animate)
                 this.innerText = "继续物理模拟";
             }else{
                 Runner.start(runner,engine);
@@ -391,10 +417,53 @@
                     if (!document.getElementById("randomColorCheck").checked) {
                         fontcolor = document.getElementById("colorInput"+(wi%3+1)).value;
                     }
-                    svgfonts[svgname].clone(function (svgText) {
-                        svgText.xml = svgfonts[svgname].xml;
-                        svgText.svgname = svgname;
-                        svgText.fontSize = fontSize;
+                    if(svgfonts[svgname]!=null){
+                        svgfonts[svgname].clone(function (svgText) {
+                            svgText.xml = svgfonts[svgname].xml;
+                            svgText.svgname = svgname;
+                            svgText.fontSize = fontSize;
+                            var position = getRandomPosition();
+                            if (prePositions.length > 0) {
+                                position = prePositions.splice(Math.floor(Math.random() * prePositions
+                                    .length), 1)[0];
+                            } else {
+                                if (prePositions2.length > 0) {
+                                    position = prePositions2.splice(Math.floor(Math.random() * prePositions2
+                                        .length), 1)[0];
+                                }
+                            }
+                            var angle = getRandomAngle();
+                            //var angle = 0;
+                            svgText.set({
+                                originX: "center",
+                                originY: "center",
+                                selectable: true,
+                                fill: fontcolor,
+                                objectCaching: false
+                            });
+                            if (svgText.type == "group") {
+                                var sobjects = svgText.getObjects();
+                                for (var i in sobjects) {
+                                    sobjects[i].set({
+                                        fill: fontcolor
+                                    });
+                                }
+                            }
+                            svgText.setPositionByOrigin(new fabric.Point(position.x, position.y), "center",
+                                "center");
+                            svgText.scale(1 / 200 * fontSize);
+                            svgText.rotate(angle);
+                            var svgTextCoords = svgText.getCoords();
+                            createRect(svgText, svgTextCoords[0].x + svgText.getScaledWidth() / 2,
+                                svgTextCoords[0].y + svgText.getScaledHeight() / 2, svgText
+                                .getScaledWidth(), svgText.getScaledHeight(), svgText.angle);
+                            canvas.add(svgText);
+                        })
+                    }else{
+                        var svgText = new fabric.Text(svgname, {
+                            width: fontSize,
+                            fontSize: fontSize
+                        });
                         var position = getRandomPosition();
                         if (prePositions.length > 0) {
                             position = prePositions.splice(Math.floor(Math.random() * prePositions
@@ -406,33 +475,25 @@
                             }
                         }
                         var angle = getRandomAngle();
-                        //var angle = 0;
                         svgText.set({
                             originX: "center",
                             originY: "center",
                             selectable: true,
                             fill: fontcolor,
-                            objectCaching: false
+                            objectCaching: false,
+                            editable:false
                         });
-                        if (svgText.type == "group") {
-                            var sobjects = svgText.getObjects();
-                            for (var i in sobjects) {
-                                sobjects[i].set({
-                                    fill: fontcolor
-                                });
-                            }
-                        }
                         svgText.setPositionByOrigin(new fabric.Point(position.x, position.y), "center",
                             "center");
-                        svgText.scale(1 / 200 * fontSize);
+                        //svgText.scale(1 / 200 * fontSize);
                         svgText.rotate(angle);
                         var svgTextCoords = svgText.getCoords();
                         createRect(svgText, svgTextCoords[0].x + svgText.getScaledWidth() / 2,
                             svgTextCoords[0].y + svgText.getScaledHeight() / 2, svgText
                             .getScaledWidth(), svgText.getScaledHeight(), svgText.angle);
-                        canvas.add(svgText);
-                    })
 
+                        canvas.add(svgText).setActiveObject(svgText)
+                    }
 
 
                 }
@@ -536,9 +597,10 @@
 
         function createRect(obj, x, y, width, height, angle) {
             var box = Bodies.rectangle(x, y, width, height);
-            if(obj.svgname == "FS"){
+            if(obj.svgname == "FS" || svgfonts[obj.svgname] == null){
                 Matter.Body.scale(box, 0.7, 0.7);
-            }else{
+            }
+            else{
                 var vertexSets = select(obj.xml, 'path').map(function(path) { return Vertices.scale(Svg.pathToVertices(path, 20),width/190,height/190); });
                 box = Bodies.fromVertices(x, y, vertexSets);
             }
@@ -548,9 +610,9 @@
         }
 
         function animate() {
-            engine.gravity.x = document.getElementById("gravitySliderX").value;
-            engine.gravity.y = document.getElementById("gravitySliderY").value;
-            Engine.update(engine);
+            if(isrunning){
+                engine_animate();
+            }
             canvas.forEachObject(function (obj) {
                 const updatedX = obj.matterObj.position.x;
                 const updatedY = obj.matterObj.position.y;
@@ -565,6 +627,11 @@
             if(isrunning){
                 RAFID = requestAnimationFrame(animate)
             }
+        }
+        function engine_animate(){
+            engine.gravity.x = document.getElementById("gravitySliderX").value;
+            engine.gravity.y = document.getElementById("gravitySliderY").value;
+            Engine.update(engine);
         }
     </script>
 </body>
