@@ -8,53 +8,9 @@
             font-family: Arial, sans-serif;
         }
 
-        .card-body{
-            background-color: #fef0d8;
+        canvas {
+            border: 1px solid #000;
         }
-        .input-group-text{
-            background-color: #db0921!important;
-            color: #ffffff!important;
-        }/* 隐藏默认的滑块和轨道 */
-  input[type=range] {
-    -webkit-appearance: none; /* Chrome, Safari, Opera */
-    width: 100%; /* Full-width */
-    margin: 5px 0;
-  }
-
-  /* 创建自定义轨道 */
-  input[type=range]::-webkit-slider-runnable-track {
-    width: 100%;
-    height: 4px;
-    cursor: pointer;
-    background: #db0921; /* 轨道颜色 */
-    border-radius: 1.3px;
-  }
-
-  /* 创建自定义滑块 */
-  input[type=range]::-webkit-slider-thumb {
-    height: 24px;
-    width: 24px;
-    border-radius: 12px;
-    background: #db0921; /* 滑块颜色 */
-    cursor: pointer;
-    -webkit-appearance: none;
-    margin-top: -10px; /* 滑块垂直居中 */
-  }
-
-  /* 鼠标悬停在滑块上时改变滑块颜色 */
-  input[type=range]:hover::-webkit-slider-thumb {
-    background: #ffffff; /* 鼠标悬停时的滑块颜色 */
-  }
-
-  /* 滑块被按下时改变滑块颜色 */
-  input[type=range]:active::-webkit-slider-thumb {
-    background: #ffffff; /* 滑块被按下时的颜色 */
-  }
-
-  /* 禁用滑块时的样式 */
-  input[type=range]:disabled::-webkit-slider-thumb {
-    background: #bdbdbd; /* 禁用时的滑块颜色 */
-  }
     </style>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/bootstrap-icons.css">
@@ -62,30 +18,30 @@
 </head>
 
 <body>
-    <div class="container" style="max-width: 100%;margin: 20px auto 0 auto;">
+    <div class="container" style="max-width: 100%;margin: 20px auto;">
         <div class="row">
             <div class="col">
 
                 <div class="controls">
                     <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title">生成器</h5>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title mb-5 mt-3" style="font-weight: bold;">生成器</h5>
                             <div class="input-group mb-3">
-                                <label for="textInput" class="input-group-text" style="line-height: 1;font-weight: bold;font-size: 14px;">输入文字</label>
-                                <input type="text" id="textInput" class="form-control" placeholder="932°F PIZZA MARKET" style="line-height: 1;"
-                                    value="932°F PIZZA MARKET">
+                                <label for="textInput" class="input-group-text">输入文字</label>
+                                <input type="text" id="textInput" class="form-control" placeholder="932°F PIZZA MARKET"
+                                    value="测试932°F PIZZA MARKET">
                             </div>
                             <div class="input-group mb-3">
-                                <label for="canvasWidth" style="font-weight: bold;">画布宽度 <span id="canvasWidth-span" style="font-size: 14px;font-weight: normal;">600</span></label>
-                                <!--<input type="text" id="canvasWidth" class="form-control" placeholder="600" value="600">-->
-                                <input type="range" class="form-range mb-3" id="canvasWidth" min="100" max="960" value="600">
+                                <label for="canvasWidth" class="input-group-text">画布宽度</label>
+                                <input type="text" id="canvasWidth" class="form-control" placeholder="600" value="600">
                             </div>
                             <div class="input-group mb-3">
-                                <label for="canvasHeight" style="font-weight: bold;">画布高度 <span id="canvasHeight-span" style="font-size: 14px;font-weight: normal;">600</span></label>
-                                <!--<input type="text" id="canvasHeight" class="form-control" placeholder="600" value="600">-->
-                                <input type="range" class="form-range mb-3" id="canvasHeight" min="100" max="960" value="600">
+                                <label for="canvasHeight" class="input-group-text">画布高度</label>
+                                <input type="text" id="canvasHeight" class="form-control" placeholder="600" value="600">
                             </div>
-                            <!--<div class="form-check form-switch mb-3">
+                            <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" role="switch" id="randomColorCheck"
                                     checked>
                                 <label class="form-check-label" for="randomColorCheck">随机颜色</label>
@@ -108,40 +64,52 @@
                                             value="#FF6800" title="Choose your color">
                                     </div>
                                 </div>
-                            </div>-->
-                            <label for="fontSizeSlider" style="font-weight: bold;">字号大小 <span id="fontSizeSlider-span" style="font-size: 14px;font-weight: normal;">150pt</span></label>
+                            </div>
+                            <label for="fontSizeSlider">字号大小：<span id="fontSizeSlider-span">150</span></label>
                             <input type="range" class="form-range mb-3" id="fontSizeSlider" min="10" max="500"
                                 value="150">
-                            <div class="text-muted mb-4 mt-2" style="font-size: 12px;">
+                            <div class="text-muted" style="font-size: 12px;">
                                 调整字号时建议先暂停物理模拟，防止字体重叠时触发碰撞检测导致位置变化
                             </div>
-                            <button type="button" id="generateBtn" class="btn" style="background-color: #db0921;color: #ffffff;line-height: 1;font-weight: bold;font-size: 14px;" data-bs-toggle="tooltip"  data-bs-placement="bottom" data-bs-title="SVG解算较为耗时，因此点击生成按钮后需要等待几秒">生成</button>
-                            <button type="button" id="exportBtn" class="btn" style="background-color: #008b43;color: #ffffff;line-height: 1;font-weight: bold;font-size: 14px;">导出</button>
+                            <br>
+                            <button type="button" id="generateBtn" class="btn btn-outline-primary">生成</button>
+                            <button type="button" id="exportBtn" class="btn btn-outline-success">导出</button>
+                        </div>
+                        <div class="card-footer text-muted" style="font-size: 12px;">
+                            SVG解算较为耗时，因此点击生成按钮后需要等待几秒
+                        </div>
+                    </div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title">物理属性设置</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <button type="button" id="matterRunnerBtn" class="btn btn-outline-danger">暂停物理模拟</button>
+                            </div>
                             
-                            <h5 class="card-title mb-5 mt-5" style="font-weight: bold;">物理属性设置</h5>
-                            
-                            <label for="gravitySliderY" style="font-weight: bold;">竖向重力 <span id="gravitySliderY-span" style="font-size: 14px;font-weight: normal;">0</span><button
-                                    class="btn btn-sm ms-3"
+                            <label for="gravitySliderY">竖向重力：<span id="gravitySliderY-span">0</span><button
+                                    class="btn btn-outline-primary btn-sm ms-3"
                                     onclick="document.getElementById('gravitySliderY').value=0;document.getElementById('gravitySliderY-span').textContent=0;"><i
                                         class="bi bi-arrow-clockwise"></i></button></label>
                             <input type="range" class="form-range" id="gravitySliderY" min="-2" max="2" value="0"
                                 step="0.1">
-                            <label for="gravitySliderX" style="font-weight: bold;">横向重力 <span id="gravitySliderX-span" style="font-size: 14px;font-weight: normal;">0</span><button
-                                    class="btn btn-sm ms-3"
+                            <label for="gravitySliderX">横向重力：<span id="gravitySliderX-span">0</span><button
+                                    class="btn btn-outline-primary btn-sm ms-3"
                                     onclick="document.getElementById('gravitySliderX').value=0;document.getElementById('gravitySliderX-span').textContent=0;"><i
                                         class="bi bi-arrow-clockwise"></i></button></label>
                             <input type="range" class="form-range" id="gravitySliderX" min="-2" max="2" value="0"
                                 step="0.1">
-                            <div class="mb-5">
-                                <button type="button" id="matterRunnerBtn" class="btn" style="background-color: #db0921;color: #ffffff;line-height: 1;font-weight: bold;font-size: 14px;">暂停物理模拟</button>
-                            </div>
-
-                            <div id="selectedTargetSetting" style="visibility: hidden;">
-                                    <h5 class="card-title mb-5" style="font-weight: bold;">选中字符设置</h5>
-                                    <label for="STcolorInput" class="form-label" style="font-weight: bold;">字体颜色</label>
-                                    <input type="color" class="form-control form-control-color" id="STcolorInput"
-                                        value="#EC0022" title="Choose your color">
-                            </div>
+                        </div>
+                    </div>
+                    <div class="card" id="selectedTargetSetting" style="display: none;">
+                        <div class="card-header">
+                            <h5 class="card-title">选中字符设置</h5>
+                        </div>
+                        <div class="card-body">
+                            <label for="STcolorInput" class="form-label">字体颜色</label>
+                            <input type="color" class="form-control form-control-color" id="STcolorInput"
+                                value="#EC0022" title="Choose your color">
                         </div>
                     </div>
                     <br>
@@ -149,10 +117,10 @@
             </div>
             <div class="col">
                 <div class="card mb-3">
-                    <!--<div class="card-header">
+                    <div class="card-header">
                         <h5 class="card-title">渲染界面</h5>
-                    </div>-->
-                    <div class="card-body p-0" style="background-color: #444444;height: 960px;max-height: 960px;">
+                    </div>
+                    <div class="card-body p-0">
                         <div class="canvas-container">
                             <canvas id="canvas" style="width: 600px;height: 600px;"></canvas>
                         </div>
@@ -161,10 +129,10 @@
             </div>
             <div class="col">
                 <div class="card mb-3">
-                    <!--<div class="card-header">
+                    <div class="card-header">
                         <h5 class="card-title">调整界面</h5>
-                    </div>-->
-                    <div class="card-body p-0" style="background-color: #444444;height: 960px;max-height: 960px;">
+                    </div>
+                    <div class="card-body p-0">
                         <div id="matter-canvas">
                         </div>
                     </div>
@@ -177,9 +145,6 @@
     <script src="js/matter.js"></script>
     <script src="js/decomp.min.js"></script>
     <script>
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-        
         document.getElementById("gravitySliderY").addEventListener('change', (e) => {
             const value = e.target.value;
             document.getElementById("gravitySliderY-span").textContent = `${value}`;
@@ -198,7 +163,7 @@
         });
         document.getElementById("fontSizeSlider").addEventListener('change', (e) => {
             const value = e.target.value;
-            document.getElementById("fontSizeSlider-span").textContent = `${value}pt`;
+            document.getElementById("fontSizeSlider-span").textContent = `${value}`;
             if(canvas != null){
                 canvas.forEachObject(function (obj) {
                     var scale = 1 / 200 * value;
@@ -213,7 +178,7 @@
         });
         document.getElementById("fontSizeSlider").addEventListener('input', (e) => {
             const value = e.target.value;
-            document.getElementById("fontSizeSlider-span").textContent = `${value}pt`;
+            document.getElementById("fontSizeSlider-span").textContent = `${value}`;
             if(canvas != null){
                 canvas.forEachObject(function (obj) {
                     var scale = 1 / 200 * value;
@@ -225,22 +190,6 @@
                 });
                 canvas.renderAll();
             }
-        });
-        document.getElementById("canvasWidth").addEventListener('change', (e) => {
-            const value = e.target.value;
-            document.getElementById("canvasWidth-span").textContent = `${value}`;
-        });
-        document.getElementById("canvasWidth").addEventListener('input', (e) => {
-            const value = e.target.value;
-            document.getElementById("canvasWidth-span").textContent = `${value}`;
-        });
-        document.getElementById("canvasHeight").addEventListener('change', (e) => {
-            const value = e.target.value;
-            document.getElementById("canvasHeight-span").textContent = `${value}`;
-        });
-        document.getElementById("canvasHeight").addEventListener('input', (e) => {
-            const value = e.target.value;
-            document.getElementById("canvasHeight-span").textContent = `${value}`;
         });
         document.getElementById("randomColorCheck").addEventListener('change', (e) => {
             if (e.target.checked) {
@@ -275,11 +224,11 @@
             'selection:updated':updateSelectedTarget,
             'selection:cleared':function(){
                 selectedTarget = null;
-                document.getElementById("selectedTargetSetting").style.visibility = "hidden";
+                document.getElementById("selectedTargetSetting").style.display = "none";
             }
         });
         function updateSelectedTarget(e){
-            document.getElementById("selectedTargetSetting").style.visibility = "visible";
+            document.getElementById("selectedTargetSetting").style.display = "block";
             selectedTarget = e.selected;
             document.getElementById("STcolorInput").value = selectedTarget[0].fill;
         }
@@ -385,7 +334,7 @@
             
         });
         generateBtn.addEventListener("click", function () {
-            [...tooltipList].map((item)=>item.hide());
+
             var textInput = document.getElementById("textInput").value;
             canvasWidth = parseInt(document.getElementById("canvasWidth").value);
             canvasHeight = parseInt(document.getElementById("canvasHeight").value);
@@ -397,7 +346,7 @@
                 width: canvasWidth,
                 height: canvasHeight
             });
-            canvas.backgroundColor = "#fef0d8"
+            canvas.backgroundColor = "#feefd6"
 
             function getRandomPosition() {
                 var x = Math.random() * (canvasWidth);
@@ -466,10 +415,9 @@
                     if (svgname == ' ') {
                         continue;
                     }
-                    /*if (!document.getElementById("randomColorCheck").checked) {
+                    if (!document.getElementById("randomColorCheck").checked) {
                         fontcolor = document.getElementById("colorInput"+(wi%3+1)).value;
-                    }*/
-                    fontcolor = ["#DB0921","#008B43","#F08300"][wi%3];
+                    }
                     if(svgfonts[svgname]!=null){
                         svgfonts[svgname].clone(function (svgText) {
                             svgText.xml = svgfonts[svgname].xml;
