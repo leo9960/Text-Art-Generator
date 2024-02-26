@@ -32,13 +32,13 @@
 
   /* 创建自定义滑块 */
   input[type=range]::-webkit-slider-thumb {
-    height: 24px;
-    width: 24px;
-    border-radius: 12px;
+    height: 16px;
+    width: 16px;
+    border-radius: 8px;
     background: #db0921; /* 滑块颜色 */
     cursor: pointer;
     -webkit-appearance: none;
-    margin-top: -10px; /* 滑块垂直居中 */
+    margin-top: -6px; /* 滑块垂直居中 */
   }
 
   /* 鼠标悬停在滑块上时改变滑块颜色 */
@@ -76,14 +76,14 @@
                                     value="932°F PIZZA MARKET">
                             </div>
                             <div class="input-group mb-3">
-                                <label for="canvasWidth" style="font-weight: bold;">画布宽度 <span id="canvasWidth-span" style="font-size: 14px;font-weight: normal;">600</span></label>
+                                <label for="canvasWidth" style="font-weight: bold;">画布宽度 <span id="canvasWidth-span" style="font-size: 14px;font-weight: normal;" ondblclick="{this.style.display='none';document.getElementById('canvasWidth-input').style.display='block';document.getElementById('canvasWidth-input').value=document.getElementById('canvasWidth').value;}">700</span></label><input type="text" class="form-control" id="canvasWidth-input" style="height: 24px;font-size: 14px;font-weight: normal;display: none;" onchange="{document.getElementById('canvasWidth').value=this.value;document.getElementById('canvasWidth-span').textContent = this.value;this.style.display='none';document.getElementById('canvasWidth-span').style.display='inline';}">
                                 <!--<input type="text" id="canvasWidth" class="form-control" placeholder="600" value="600">-->
-                                <input type="range" class="form-range mb-3" id="canvasWidth" min="100" max="960" value="600">
+                                <input type="range" class="form-range mb-3" id="canvasWidth" min="100" max="960" value="700">
                             </div>
                             <div class="input-group mb-3">
-                                <label for="canvasHeight" style="font-weight: bold;">画布高度 <span id="canvasHeight-span" style="font-size: 14px;font-weight: normal;">600</span></label>
+                                <label for="canvasHeight" style="font-weight: bold;">画布高度 <span id="canvasHeight-span" style="font-size: 14px;font-weight: normal;" ondblclick="{this.style.display='none';document.getElementById('canvasHeight-input').style.display='block';document.getElementById('canvasHeight-input').value=document.getElementById('canvasHeight').value;}">700</span></label><input type="text" class="form-control" id="canvasHeight-input" style="height: 24px;font-size: 14px;font-weight: normal;display: none;" onchange="{document.getElementById('canvasHeight').value=this.value;document.getElementById('canvasHeight-span').textContent = this.value;this.style.display='none';document.getElementById('canvasHeight-span').style.display='inline';}">
                                 <!--<input type="text" id="canvasHeight" class="form-control" placeholder="600" value="600">-->
-                                <input type="range" class="form-range mb-3" id="canvasHeight" min="100" max="960" value="600">
+                                <input type="range" class="form-range mb-3" id="canvasHeight" min="100" max="960" value="700">
                             </div>
                             <!--<div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" role="switch" id="randomColorCheck"
@@ -109,9 +109,11 @@
                                     </div>
                                 </div>
                             </div>-->
-                            <label for="fontSizeSlider" style="font-weight: bold;">字号大小 <span id="fontSizeSlider-span" style="font-size: 14px;font-weight: normal;">150pt</span></label>
+                            <div class="input-group mb-3">
+                            <label for="fontSizeSlider" style="font-weight: bold;">字号大小 <span id="fontSizeSlider-span" style="font-size: 14px;font-weight: normal;" ondblclick="{this.style.display='none';document.getElementById('fontSizeSlider-input').style.display='block';document.getElementById('fontSizeSlider-input').value=document.getElementById('fontSizeSlider').value;}">175pt</span></label><input type="text" class="form-control" id="fontSizeSlider-input" style="height: 24px;font-size: 14px;font-weight: normal;display: none;" onchange="{document.getElementById('fontSizeSlider').value=this.value;document.getElementById('fontSizeSlider-span').textContent = this.value+'pt';this.style.display='none';document.getElementById('fontSizeSlider-span').style.display='inline';}">
                             <input type="range" class="form-range mb-3" id="fontSizeSlider" min="10" max="500"
-                                value="150">
+                                value="175">
+                            </div>
                             <div class="text-muted mb-4 mt-2" style="font-size: 12px;">
                                 调整字号时建议先暂停物理模拟，防止字体重叠时触发碰撞检测导致位置变化
                             </div>
@@ -152,9 +154,9 @@
                     <!--<div class="card-header">
                         <h5 class="card-title">渲染界面</h5>
                     </div>-->
-                    <div class="card-body p-0" style="background-color: #444444;height: 960px;max-height: 960px;">
+                    <div class="card-body p-0" style="background-color: #ffffff;height: 960px;max-height: 960px;">
                         <div class="canvas-container">
-                            <canvas id="canvas" style="width: 600px;height: 600px;"></canvas>
+                            <canvas id="canvas" style="width: 700px;height: 700px;"></canvas>
                         </div>
                     </div>
                 </div>
@@ -164,7 +166,7 @@
                     <!--<div class="card-header">
                         <h5 class="card-title">调整界面</h5>
                     </div>-->
-                    <div class="card-body p-0" style="background-color: #444444;height: 960px;max-height: 960px;">
+                    <div class="card-body p-0" style="background-color: #ffffff;height: 960px;max-height: 960px;">
                         <div id="matter-canvas">
                         </div>
                     </div>
@@ -251,11 +253,11 @@
         });
     </script>
     <script>
-        var canvasWidth = 600;
-        var canvasHeight = 600;
+        var canvasWidth = 700;
+        var canvasHeight = 700;
         var canvas = new fabric.Canvas("canvas", {
-            width: 600,
-            height: 600,
+            width: 700,
+            height: 700,
             selection:false
         });
         var matterRunnerBtn = document.getElementById("matterRunnerBtn");
@@ -598,7 +600,9 @@
                     width: canvasWidth,
                     height: canvasHeight,
                     showVelocity: true,
-                    showAngleIndicator: true
+                    showAngleIndicator: true,
+                    wireframeBackground: "#fef0d8",
+                    //wireframes: false
                 }
             });
 
